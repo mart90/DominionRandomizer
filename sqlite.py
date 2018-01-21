@@ -30,4 +30,4 @@ class Sqlite(object):
         except Error as e:
             logging.error(e)
 
-sql = Sqlite()
+db = Sqlite()
