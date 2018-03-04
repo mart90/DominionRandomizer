@@ -61,6 +61,7 @@ class SqlOps(object):
                 playerId integer,
                 bid integer,
                 score integer,
+                turn integer,
                 FOREIGN KEY (gameId) REFERENCES game(id),
                 FOREIGN KEY (playerId) REFERENCES player(id)
             );
