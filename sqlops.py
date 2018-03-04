@@ -6,20 +6,6 @@ class SqlOps(object):
         db.connect('dominion.db')
 
     @staticmethod
-    def reset_db():
-        db.cursor.executescript("""
-            DELETE FROM playerVote;
-            DELETE FROM cardVote;
-            DELETE FROM gameCard;
-            DELETE FROM bid;
-            DELETE FROM gamePlayer;
-            DELETE FROM game;
-            DELETE FROM player;
-            DELETE FROM cardToTypeMapping;
-            DELETE FROM cardType;
-            DELETE FROM card;""")
-
-    @staticmethod
     def create_tables():
         db.cursor.executescript("""
             CREATE TABLE IF NOT EXISTS card (
@@ -61,17 +47,20 @@ class SqlOps(object):
                 playerId integer,
                 bid integer,
                 score integer,
+                adjustedScore float,
                 turn integer,
                 FOREIGN KEY (gameId) REFERENCES game(id),
                 FOREIGN KEY (playerId) REFERENCES player(id)
             );
 
-            CREATE TABLE IF NOT EXISTS gameCardBuy(
+            CREATE TABLE IF NOT EXISTS cardBuy(
                 id integer PRIMARY KEY,
-                gameCardId integer,
+                cardId integer,
+                gameId integer,
                 playerId integer,
                 amountBought integer,
-                FOREIGN KEY (gameCardId) REFERENCES gameCard(id),
+                FOREIGN KEY (cardId) REFERENCES card(id),
+                FOREIGN KEY (gameId) REFERENCES game(id),
                 FOREIGN KEY (playerId) REFERENCES player(id)
             );
 

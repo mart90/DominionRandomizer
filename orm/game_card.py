@@ -1,6 +1,6 @@
 from alchemy_wrap import *
 from card import Card
-from game_card_buy import GameCardBuy
+from card_buy import CardBuy
 
 
 class GameCard(base):
@@ -12,13 +12,7 @@ class GameCard(base):
 
     card = relationship('Card', back_populates='games')
     game = relationship('Game', back_populates='cards')
-    buys = relationship('GameCardBuy', back_populates='gameCard')
 
     def build_from_dict(self, dct):
         self.cardId = Card.select_id_by_name(dct['name'])
-
-        for buy in dct['buys']:
-            if buy['amount bought'] != 0:
-                self.buys.append(GameCardBuy().build_from_dict(buy))
-
         return self

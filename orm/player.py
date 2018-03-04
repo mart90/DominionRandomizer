@@ -11,7 +11,7 @@ class Player(base):
     games = relationship('GamePlayer', back_populates='player')
     votesInitiated = relationship('CardVote', back_populates='initiator')
     votes = relationship('PlayerVote', back_populates='player')
-    buys = relationship('GameCardBuy', back_populates='player')
+    buys = relationship('CardBuy', back_populates='player')
 
     @staticmethod
     def select_id_by_name(name):

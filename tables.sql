@@ -37,17 +37,20 @@ CREATE TABLE IF NOT EXISTS gamePlayer (
     playerId integer,
     bid integer,
     score integer,
+    adjustedScore float,
     turn integer,
     FOREIGN KEY (gameId) REFERENCES game(id),
     FOREIGN KEY (playerId) REFERENCES player(id)
 );
 
-CREATE TABLE IF NOT EXISTS gameCardBuy(
+CREATE TABLE IF NOT EXISTS cardBuy(
     id integer PRIMARY KEY,
-    gameCardId integer,
+    cardId integer,
+    gameId integer,
     playerId integer,
     amountBought integer,
-    FOREIGN KEY (gameCardId) REFERENCES gameCard(id),
+    FOREIGN KEY (cardId) REFERENCES card(id),
+    FOREIGN KEY (gameId) REFERENCES game(id),
     FOREIGN KEY (playerId) REFERENCES player(id)
 );
 

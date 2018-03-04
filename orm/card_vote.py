@@ -2,7 +2,6 @@ from alchemy_wrap import *
 from card import Card
 from player import Player
 from player_vote import PlayerVote
-from sql import sql
 
 
 class CardVote(base):
@@ -25,9 +24,6 @@ class CardVote(base):
         self.result = 1  # Pass
 
         for vote in dct['votes']:
-            if vote['player'] != "":
-                continue
-
             playervote = PlayerVote().build_from_dict(vote)
             if playervote.vote == 0:
                 self.result = 0

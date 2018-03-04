@@ -1,8 +1,8 @@
 from alchemy_wrap import *
-from sql import sql
 from orm import Card
+from randomizer_config import RandomizerConfig
+from sql import sql
 import random
-from RandomizerConfig import RandomizerConfig
 
 
 class Randomizer(object):

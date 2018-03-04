@@ -19,6 +19,7 @@ class Card(base):
     types = relationship('CardType', back_populates='card')
     games = relationship('GameCard', back_populates='card')
     votes = relationship('CardVote', back_populates='card')
+    buys = relationship('CardBuy', back_populates='card')
 
     @staticmethod
     def select_id_by_name(name):

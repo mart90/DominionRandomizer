@@ -11,6 +11,7 @@ class GamePlayer(base):
     playerId = Column(Integer, ForeignKey('player.id'))
     bid = Column(Integer)
     score = Column(Integer)
+    adjustedScore = Column(Float)
     turn = Column(Integer)
 
     game = relationship('Game', back_populates='players')

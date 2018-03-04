@@ -6,4 +6,4 @@ from game import Game
 from game_card import GameCard
 from game_player import GamePlayer
 from player_vote import PlayerVote
-from game_card_buy import GameCardBuy
+from card_buy import CardBuy

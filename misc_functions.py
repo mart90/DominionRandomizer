@@ -1,10 +1,10 @@
-from sql import sql
 from orm import *
+from sql import sql
 
 
 def init_database():
     from sqlops import SqlOps
-    from kingdomcards import kingdomcards
+    from sources.kingdomcards import kingdomcards
 
     SqlOps().create_tables()
 
@@ -17,12 +17,12 @@ def init_database():
 
 
 def add_games():
-    from game_dicts import games
+    from sources.game_dicts import games
 
-    for game in games:
-        g = Game()
-        g.build_from_dict(game)
-        sql.add(g)
+    for gamedict in games:
+        game = Game()
+        game.build_from_dict(gamedict)
+        sql.add(game)
 
 
 # Get a comma separated list of cards for the Google sheets drop down menus
