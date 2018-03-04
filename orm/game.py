@@ -33,6 +33,8 @@ class Game(base):
         for vote in dct['votes']:
             self.votes.append(CardVote().build_from_dict(vote))
 
+        # TODO build player votes
+
         self.winnerId = self.get_winner()
         return self
 

@@ -8,41 +8,47 @@ from RandomizerConfig import RandomizerConfig
 class Randomizer(object):
     def __init__(self):
         self.cards = sql.query(Card).all()
+        self.expansions = [expansion[0] for expansion in sql.query(distinct(Card.expansion)).all()]
         self.sortedCards = {}
-        self.setSortedCards()
         self.chosenCards = []
 
-    def randomize(self):
-        self.chosenCards = self.choose10cards()
-        return [card for card in self.chosenCards]
+        self.setSortedCards()
 
-    def choose10cards(self):
-        for key, value in self.sortedCards.items():
-            amountOfCardsInSet = len(value)
-            chosenCardsInSet = []
+    def randomize10(self):
+        for expansion in self.expansions:
+            amountToRandomize = RandomizerConfig["amountOfCardsPerSet"][expansion]
+            self.chosenCards += self.randomizeCardsByExpansion(expansion, amountToRandomize)
 
-            while len(chosenCardsInSet) < RandomizerConfig["amountOfCardsPerSet"][key]:
-                randomCard = value[random.randint(0, amountOfCardsInSet - 1)]
+    def randomizeCardsByExpansion(self, expansion, amountToRandomize):
+        cardsInExpansion = self.sortedCards[expansion]
 
-                if randomCard not in chosenCardsInSet:
-                    chosenCardsInSet.append(randomCard)
+        chosenCards = []
+        while len(chosenCards) < amountToRandomize:
+            randomCard = cardsInExpansion[random.randint(0, len(cardsInExpansion) - 1)]
+            if randomCard not in chosenCards:
+                chosenCards.append(randomCard)
 
-            self.chosenCards += chosenCardsInSet
-        return self.chosenCards
+        return chosenCards
 
     def setSortedCards(self):
-        expansions = ["base", "intrigue", "dark ages", "prosperity"]
-        for expansion in expansions:
+        for expansion in self.expansions:
             self.sortedCards[expansion] = [card for card in self.cards if card.expansion == expansion]
 
     def replaceCard(self, card):
-        self.addNewCardFromExpansion(card.expansion)
-        self.chosenCards.remove(card)
-        return self.chosenCards
-
-    def addNewCardFromExpansion(self, expansion):
-        expansionCards = self.sortedCards[expansion]
-        newCard = expansionCards[random.randint(0, len(expansionCards) - 1)]
+        newCard = self.randomizeCardsByExpansion(card.expansion, 1)[0]
         while newCard in self.chosenCards:
-            newCard = expansionCards[random.randint(0, len(expansionCards) - 1)]
+            newCard = self.randomizeCardsByExpansion(card.expansion, 1)[0]
+
         self.chosenCards.append(newCard)
+        self.chosenCards.remove(card)
+
+    def printChosenCards(self):
+        for card in self.chosenCards:
+            print(card.name + ", " + card.expansion)
+        print()
+
+    def swapCardsFromUserInput(self):
+        while True:
+            cardName = input("Kaartje swappen?\n")
+            self.replaceCard([card for card in self.chosenCards if card.name == cardName][0])
+            self.printChosenCards()
