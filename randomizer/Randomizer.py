@@ -1,54 +1,79 @@
 from alchemy_wrap import *
 from orm import Card
-from randomizer_config import RandomizerConfig
+from randomizer_config import config
 from sql import sql
 import random
 
 
 class Randomizer(object):
     def __init__(self):
-        self.cards = sql.query(Card).all()
-        self.expansions = [expansion[0] for expansion in sql.query(distinct(Card.expansion)).all()]
-        self.sortedCards = {}
+        self.cardpool = []
         self.chosenCards = []
 
-        self.setSortedCards()
+        self.set_cardpool()
 
-    def randomize10(self):
-        for expansion in self.expansions:
-            amountToRandomize = RandomizerConfig["amountOfCardsPerSet"][expansion]
-            self.chosenCards += self.randomizeCardsByExpansion(expansion, amountToRandomize)
+    def set_cardpool(self):
+        expansions = []
+        for expansion, amount in config['cards per set'].items():
+            if amount > 0:
+                expansions.append(expansion)
 
-    def randomizeCardsByExpansion(self, expansion, amountToRandomize):
-        cardsInExpansion = self.sortedCards[expansion]
+        self.cardpool = [card for card in sql.query(Card).all() if card.expansion in expansions]
 
-        chosenCards = []
-        while len(chosenCards) < amountToRandomize:
-            randomCard = cardsInExpansion[random.randint(0, len(cardsInExpansion) - 1)]
-            if randomCard not in chosenCards:
-                chosenCards.append(randomCard)
+    def randomize_all(self):
+        for forcedattr, amount in config['forced attributes'].items():
+            if amount > 0:
+                self.randomize_one(None, None, {
+                    'attrname': forcedattr,
+                    'amount': amount})
 
-        return chosenCards
+        for cardtype, forced in config['forced types'].items():
+            if forced:
+                self.randomize_one(None, cardtype)
 
-    def setSortedCards(self):
-        for expansion in self.expansions:
-            self.sortedCards[expansion] = [card for card in self.cards if card.expansion == expansion]
+        self.fill_chosen_cards()
 
-    def replaceCard(self, card):
-        newCard = self.randomizeCardsByExpansion(card.expansion, 1)[0]
-        while newCard in self.chosenCards:
-            newCard = self.randomizeCardsByExpansion(card.expansion, 1)[0]
+    def fill_chosen_cards(self):
+        for expansion, amount in config['cards per set'].items():
+            amounttorandomize = amount - len([card for card in self.chosenCards if card.expansion == expansion])
+            for i in range(0, amounttorandomize):
+                if len(self.chosenCards) == 10:
+                    return
+                self.randomize_one(expansion)
 
-        self.chosenCards.append(newCard)
+    def randomize_one(self, expansion=None, cardtype=None, cardattr=None):
+        cardpool = self.cardpool
+
+        if expansion is not None:
+            cardpool = [card for card in cardpool if card.expansion == expansion]
+
+        if cardtype is not None:
+            cardpool = [card for card in cardpool if card.trasher == 1] if cardtype == 'trasher' \
+                else [card for card in cardpool if cardtype in [cardtype.type for cardtype in card.types]]
+
+        if cardattr is not None:
+            attrname = cardattr['attrname']
+            forcedamount = cardattr['amount']
+            cardpool = [card for card in cardpool if card.cost == forcedamount] if attrname == 'cost' \
+                else [card for card in cardpool if getattr(card, attrname) >= forcedamount]
+
+        randomcard = cardpool[random.randint(0, len(cardpool) - 1)]
+        self.cardpool.remove(randomcard)
+        self.chosenCards.append(randomcard)
+
+    def replace_card(self, card):
+        self.randomize_one(card.expansion)
         self.chosenCards.remove(card)
 
-    def printChosenCards(self):
+    def print_chosen_cards(self):
         for card in self.chosenCards:
             print(card.name + ", " + card.expansion)
         print()
 
-    def swapCardsFromUserInput(self):
+    def swap_cards_from_user_input(self):
         while True:
-            cardName = input("Kaartje swappen?\n")
-            self.replaceCard([card for card in self.chosenCards if card.name == cardName][0])
-            self.printChosenCards()
+            cardname = input("Kaartje swappen?\n")
+            if cardname == 'n':
+                break
+            self.replace_card([card for card in self.chosenCards if card.name == cardname][0])
+            self.print_chosen_cards()

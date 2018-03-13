@@ -1,7 +1,7 @@
 import logging
 import os
 from sql import sql
-from randomizer.randomizer import Randomizer
+from randomizer import Randomizer
 from misc_functions import init_database, add_games
 
 
@@ -18,6 +18,6 @@ add_games()
 sql.commit()
 
 randomizer = Randomizer()
-randomizer.randomize10()
-randomizer.printChosenCards()
-randomizer.swapCardsFromUserInput()
+randomizer.randomize_all()
+randomizer.print_chosen_cards()
+randomizer.swap_cards_from_user_input()
