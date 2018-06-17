@@ -9,20 +9,20 @@ class Randomizer(object):
     def __init__(self):
         self.cardpool = []
         self.kingdom = []
-        self.cardsNeededPerExpansion = {}
-        self.expansionsSatisfied = False
+        self.cards_needed_per_expansion = {}
+        self.expansions_satisfied = False
 
         self.set_cardpool()
 
     def set_cardpool(self):
-        self.set_expansions()
-        expansions = [expansion for expansion in self.cardsNeededPerExpansion]
+        self.set_expansion_requirements()
+        expansions = [expansion for expansion in self.cards_needed_per_expansion]
         self.cardpool = [card for card in sql.query(Card).filter(Card.expansion.in_(expansions))]
 
-    def set_expansions(self):
+    def set_expansion_requirements(self):
         for expansion, amount in config['cards per set'].items():
             if amount > 0:
-                self.cardsNeededPerExpansion[expansion] = amount
+                self.cards_needed_per_expansion[expansion] = amount
 
     def build_kingdom(self):
         for forcedattr, amount in config['forced attributes'].items():
@@ -33,7 +33,7 @@ class Randomizer(object):
                 if self.requirement_already_satisfied(None, attrdict):
                     continue
                 self.randomize_card(None, None, attrdict)
-                if not self.expansionsSatisfied:
+                if not self.expansions_satisfied:
                     self.check_for_satisfied_expansions()
 
         for cardtype, forced in config['forced types'].items():
@@ -41,7 +41,7 @@ class Randomizer(object):
                 if self.requirement_already_satisfied(cardtype):
                     continue
                 self.randomize_card(None, cardtype)
-                if not self.expansionsSatisfied:
+                if not self.expansions_satisfied:
                     self.check_for_satisfied_expansions()
 
         self.satisfy_expansions()
@@ -61,16 +61,16 @@ class Randomizer(object):
             return True if cards else False
 
     def check_for_satisfied_expansions(self):
-        for expansion, cardsneeded in self.cardsNeededPerExpansion.items():
+        for expansion, cardsneeded in self.cards_needed_per_expansion.items():
             if cardsneeded <= 0:
                 self.cardpool = [card for card in self.cardpool if card.expansion != expansion]
 
         if not self.cardpool:
-            self.expansionsSatisfied = True
+            self.expansions_satisfied = True
             self.restore_satisfied_expansions_to_cardpool()
 
     def restore_satisfied_expansions_to_cardpool(self):
-        for expansion, cardsneeded in self.cardsNeededPerExpansion.items():
+        for expansion, cardsneeded in self.cards_needed_per_expansion.items():
             if cardsneeded <= 0:
                 self.cardpool.extend(sql.query(Card).filter(Card.expansion == expansion))
 
@@ -78,12 +78,11 @@ class Randomizer(object):
                 self.cardpool.remove([c for c in self.cardpool if c.name == card.name][0])
 
     def satisfy_expansions(self):
-        while len(self.kingdom) < 10 and not self.expansionsSatisfied:
+        while len(self.kingdom) < 10 and not self.expansions_satisfied:
             self.randomize_card()
             self.check_for_satisfied_expansions()
 
     def fill_kingdom(self):
-        self.restore_satisfied_expansions_to_cardpool()
         while len(self.kingdom) < 10:
             self.randomize_card()
 
@@ -110,7 +109,7 @@ class Randomizer(object):
 
         self.cardpool.remove(randomcard)
         self.kingdom.append(randomcard)
-        self.cardsNeededPerExpansion[randomcard.expansion] -= 1
+        self.cards_needed_per_expansion[randomcard.expansion] -= 1
 
     def replace_card(self, card):
         self.randomize_card(card.expansion)

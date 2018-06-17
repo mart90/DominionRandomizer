@@ -7,7 +7,7 @@ config = {
     },
     "forced attributes": {
         "cost": 0,
-        "draw": 2,
+        "draw": 3,
         "plusBuys": 1,
         "plusActions": 2,
         "plusCoins": 2,
@@ -17,6 +17,6 @@ config = {
         "defense": False,
         "trasher": True
     },
-    "attack forces defense": True,
-    "games to exclude": 10
+    # "attack forces defense": True,
+    # "games to exclude": 10
 }
