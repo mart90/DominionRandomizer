@@ -1,21 +1,22 @@
 config = {
     "cards per set": {
-        "base": 4,
-        "intrigue": 2,
-        "dark ages": 2,
-        "prosperity": 2
+        "base": 1,
+        "intrigue": 1,
+        "dark ages": 1,
+        "prosperity": 1
     },
     "forced attributes": {
+        "cost": 0,
         "draw": 2,
         "plusBuys": 1,
         "plusActions": 2,
         "plusCoins": 2,
     },
     "forced types": {
-        "attack": True,
+        "attack": False,
         "defense": False,
-        "trasher": False
+        "trasher": True
     },
-    "attack forces defense": False,
+    "attack forces defense": True,
     "games to exclude": 10
 }
