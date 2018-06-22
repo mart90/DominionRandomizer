@@ -14,9 +14,9 @@ config = {
     },
     "forced types": {
         "attack": False,
-        "defense": False,
+        "reaction": False,
         "trasher": True
     },
-    # "attack forces defense": True,
-    # "games to exclude": 10
+    "attack forces defense": True,
+    "games to exclude": 5,
 }

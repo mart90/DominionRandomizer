@@ -1,5 +1,5 @@
 from alchemy_wrap import *
-from orm import Card
+from orm import Card, Game, GameCard
 from randomizer_config import config
 from sql import sql
 import random
@@ -19,10 +19,20 @@ class Randomizer(object):
         expansions = [expansion for expansion in self.cards_needed_per_expansion]
         self.cardpool = [card for card in sql.query(Card).filter(Card.expansion.in_(expansions))]
 
+        if config['games to exclude'] > 0:
+            self.exclude_games(config['games to exclude'])
+
     def set_expansion_requirements(self):
         for expansion, amount in config['cards per set'].items():
             if amount > 0:
                 self.cards_needed_per_expansion[expansion] = amount
+
+    def exclude_games(self, amounttoexclude):
+        gameids = [game.id for game in sql.query(Game).order_by(desc(Game.id)).limit(amounttoexclude)]
+        cardstoexclude = [gamecard.card for gamecard in sql.query(GameCard).filter(GameCard.gameId.in_(gameids))]
+        for card in cardstoexclude:
+            if card in self.cardpool:
+                self.cardpool.remove(card)
 
     def build_kingdom(self):
         for forcedattr, amount in config['forced attributes'].items():
@@ -30,24 +40,24 @@ class Randomizer(object):
                 attrdict = {
                     'attrname': forcedattr,
                     'amount': amount}
-                if self.requirement_already_satisfied(None, attrdict):
+                if self.requirement_satisfied(None, attrdict):
                     continue
-                self.randomize_card(None, None, attrdict)
+                self.randomize_card(None, attrdict)
                 if not self.expansions_satisfied:
                     self.check_for_satisfied_expansions()
 
         for cardtype, forced in config['forced types'].items():
             if forced:
-                if self.requirement_already_satisfied(cardtype):
+                if self.requirement_satisfied(cardtype):
                     continue
-                self.randomize_card(None, cardtype)
+                self.randomize_card(cardtype)
                 if not self.expansions_satisfied:
                     self.check_for_satisfied_expansions()
 
         self.satisfy_expansions()
         self.fill_kingdom()
 
-    def requirement_already_satisfied(self, cardtype=None, cardattr=None):
+    def requirement_satisfied(self, cardtype=None, cardattr=None):
         if cardtype is not None:
             cards = [card for card in self.kingdom if card.trasher == 1] if cardtype == 'trasher' \
                 else [card for card in self.kingdom if cardtype in [cardtype.type for cardtype in card.types]]
@@ -69,6 +79,9 @@ class Randomizer(object):
             self.expansions_satisfied = True
             self.restore_satisfied_expansions_to_cardpool()
 
+            if config['games to exclude'] > 0:
+                self.exclude_games(config['games to exclude'])
+
     def restore_satisfied_expansions_to_cardpool(self):
         for expansion, cardsneeded in self.cards_needed_per_expansion.items():
             if cardsneeded <= 0:
@@ -86,7 +99,7 @@ class Randomizer(object):
         while len(self.kingdom) < 10:
             self.randomize_card()
 
-    def randomize_card(self, expansion=None, cardtype=None, cardattr=None):
+    def randomize_card(self, cardtype=None, cardattr=None, expansion=None):
         cardpool = self.cardpool
 
         if expansion is not None:
@@ -105,14 +118,23 @@ class Randomizer(object):
         randomcard = cardpool[random.randint(0, len(cardpool) - 1)]
 
         if randomcard is None:
-            return False
+            return
+
+        if 'attack' in randomcard.types \
+                and config['attack forces reaction'] \
+                and not self.requirement_satisfied('reaction'):
+            if len(self.kingdom) == 9:
+                # We still need a reaction card but the kingdom would be full after adding this. Try again
+                self.randomize_card(cardtype, cardattr, expansion)
+                return
+            self.randomize_card('reaction')
 
         self.cardpool.remove(randomcard)
         self.kingdom.append(randomcard)
         self.cards_needed_per_expansion[randomcard.expansion] -= 1
 
     def replace_card(self, card):
-        self.randomize_card(card.expansion)
+        self.randomize_card(None, None, card.expansion)
         self.kingdom.remove(card)
 
     def print_kingdom(self):

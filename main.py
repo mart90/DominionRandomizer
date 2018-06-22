@@ -18,6 +18,12 @@ logging.basicConfig(filename='dominionRandomizer.log', format=Format, level=logg
 # sql.commit()
 
 randomizer = Randomizer()
-randomizer.build_kingdom()
+
+try:
+    randomizer.build_kingdom()
+except ValueError as e:
+    print("Couldn't build a kingdom with these requirements")
+    exit(1)
+
 randomizer.print_kingdom()
 randomizer.swap_cards_from_user_input()
