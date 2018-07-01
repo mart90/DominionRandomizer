@@ -7,16 +7,22 @@ config = {
     },
     "forced attributes": {
         "cost": 0,
-        "draw": 3,
+        "plusCards": 2,
         "plusBuys": 1,
         "plusActions": 2,
-        "plusCoins": 2,
+        "plusCoins": 0,
     },
     "forced types": {
         "attack": False,
         "reaction": False,
         "trasher": True
     },
-    "attack forces defense": True,
-    "games to exclude": 5,
+    "popularity": {
+        "min": 0.01,
+        "max": 1.0,
+        "include null": True
+    },
+    "attack forces reaction": True,
+    "games to exclude": 3,
+    "exclude cards if voted x times": 1
 }

@@ -1,4 +1,5 @@
 from orm import *
+from alchemy_wrap import *
 from sql import sql
 
 
@@ -32,3 +33,22 @@ def get_card_names_from_db():
     cardnames = sql.query(Card.name).all()
     for cardname in cardnames:
         writer.write(cardname[0] + ',')
+
+
+def calculate_card_popularity():
+    for card in sql.query(Card).all():
+        popularityscorespergame = []
+
+        gamesincludingcard = [gameid[0] for gameid in sql.query(GameCard.gameId).filter(GameCard.cardId == card.id)]
+        if not gamesincludingcard:
+            continue
+
+        for gameid in gamesincludingcard:
+            totalgamebuys = sql.query(func.count(CardBuy.id)).filter(CardBuy.gameId == gameid).all()[0][0]
+            cardbuys = sql.query(func.count(CardBuy.id)).filter(CardBuy.gameId == gameid,
+                                                                CardBuy.cardId == card.id).all()[0][0]
+            popularityscorespergame.append(cardbuys / totalgamebuys)
+
+        popularityscore = sum(popularityscorespergame) / len(popularityscorespergame)
+        sql.query(Card).filter(Card.id == card.id).update({
+            "popularity": popularityscore})

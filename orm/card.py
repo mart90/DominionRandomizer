@@ -10,11 +10,12 @@ class Card(base):
     name = Column(String)
     expansion = Column(String)
     cost = Column(Integer)
-    draw = Column(Integer)
+    plusCards = Column(Integer)
     plusActions = Column(Integer)
     plusCoins = Column(Integer)
     plusBuys = Column(Integer)
     trasher = Column(Integer)
+    popularity = Column(Float)
 
     types = relationship('CardType', back_populates='card')
     games = relationship('GameCard', back_populates='card')
@@ -30,7 +31,7 @@ class Card(base):
         self.name = dct['name']
         self.expansion = dct['expansion']
         self.cost = dct['cost']
-        self.draw = dct['draw']
+        self.plusCards = dct['draw']
         self.plusActions = dct['actions']
         self.plusCoins = dct['coins']
         self.plusBuys = dct['buys']

@@ -13,11 +13,12 @@ class SqlOps(object):
                 name text UNIQUE,
                 expansion text,
                 cost integer,
-                draw integer,
+                plusCards integer,
                 plusActions integer,
                 plusCoins integer,
                 plusBuys integer,
-                trasher integer
+                trasher integer,
+                popularity float
             );
 
             CREATE TABLE IF NOT EXISTS cardType (
