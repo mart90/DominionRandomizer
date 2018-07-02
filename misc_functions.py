@@ -29,7 +29,6 @@ def add_single_game(gamedict):
     game = Game()
     game.build_from_dict(gamedict)
     sql.add(game)
-    sql.commit()
 
 
 # Get a comma separated list of cards for the Google sheets drop down menus

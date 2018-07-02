@@ -26,6 +26,7 @@ if reinitiate_database:
 
 if insert_game and gamedict:
     add_single_game(gamedict)
+    sql.commit()
     calculate_card_popularity()
     singlegamedict = open('sources/single_game_dict.py', 'w')
     singlegamedict.write("game = {}")
