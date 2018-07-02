@@ -17,13 +17,19 @@ def init_database():
         sql.add(Card().build_from_dict(cdict))
 
 
-def add_games():
+def add_all_games():
     from sources.game_dicts import games
 
     for gamedict in games:
-        game = Game()
-        game.build_from_dict(gamedict)
-        sql.add(game)
+        add_single_game(gamedict)
+    sql.commit()
+
+
+def add_single_game(gamedict):
+    game = Game()
+    game.build_from_dict(gamedict)
+    sql.add(game)
+    sql.commit()
 
 
 # Get a comma separated list of cards for the Google sheets drop down menus
@@ -52,3 +58,5 @@ def calculate_card_popularity():
         popularityscore = sum(popularityscorespergame) / len(popularityscorespergame)
         sql.query(Card).filter(Card.id == card.id).update({
             "popularity": popularityscore})
+
+    sql.commit()
