@@ -92,11 +92,10 @@ class Randomizer(object):
 
         for cardtype, amountforced in config['forced types'].items():
             if amountforced > 0:
-                if self.type_requirement_satisfied(cardtype):
-                    continue
-                self.randomize_card(cardtype)
-                if not self.expansions_satisfied:
-                    self.check_for_satisfied_expansions()
+                while not self.type_requirement_satisfied(cardtype, amountforced):
+                    self.randomize_card(cardtype)
+                    if not self.expansions_satisfied:
+                        self.check_for_satisfied_expansions()
 
         self.satisfy_expansions()
         self.fill_kingdom()

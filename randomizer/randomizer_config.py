@@ -15,10 +15,10 @@ config = {
     "forced types": {
         "attack": 0,
         "reaction": 0,
-        "trasher": 3
+        "trasher": 5
     },
     "popularity": {
-        "min": 0.01,
+        "min": 0.05,
         "max": 1.0,
         "include null": True
     },
