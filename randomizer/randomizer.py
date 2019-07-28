@@ -84,15 +84,15 @@ class Randomizer(object):
                 attrdict = {
                     'attrname': forcedattr,
                     'amount': amount}
-                if self.requirement_satisfied(None, attrdict):
+                if self.attr_requirement_satisfied(attrdict):
                     continue
                 self.randomize_card(None, attrdict)
                 if not self.expansions_satisfied:
                     self.check_for_satisfied_expansions()
 
-        for cardtype, forced in config['forced types'].items():
-            if forced:
-                if self.requirement_satisfied(cardtype):
+        for cardtype, amountforced in config['forced types'].items():
+            if amountforced > 0:
+                if self.type_requirement_satisfied(cardtype):
                     continue
                 self.randomize_card(cardtype)
                 if not self.expansions_satisfied:
@@ -101,18 +101,17 @@ class Randomizer(object):
         self.satisfy_expansions()
         self.fill_kingdom()
 
-    def requirement_satisfied(self, cardtype=None, cardattr=None):
-        if cardtype is not None:
-            cards = [card for card in self.kingdom if card.trasher == 1] if cardtype == 'trasher'\
-                else [card for card in self.kingdom if cardtype in [cardtype.type for cardtype in card.types]]
-            return True if cards else False
+    def type_requirement_satisfied(self, cardtype, amount=0):
+        cards = [card for card in self.kingdom if card.trasher == 1] if cardtype == 'trasher' \
+            else [card for card in self.kingdom if cardtype in [cardtype.type for cardtype in card.types]]
+        return True if len(cards) >= amount else False
 
-        if cardattr is not None:
-            attrname = cardattr['attrname']
-            forcedamount = cardattr['amount']
-            cards = [card for card in self.kingdom if card.cost == forcedamount] if attrname == 'cost'\
-                else [card for card in self.kingdom if getattr(card, attrname) >= forcedamount]
-            return True if cards else False
+    def attr_requirement_satisfied(self, cardattr):
+        attrname = cardattr['attrname']
+        forcedamount = cardattr['amount']
+        cards = [card for card in self.kingdom if card.cost == forcedamount] if attrname == 'cost' \
+            else [card for card in self.kingdom if getattr(card, attrname) >= forcedamount]
+        return True if cards else False
 
     def check_for_satisfied_expansions(self):
         for expansion, cardsneeded in self.cards_needed_per_expansion.items():
@@ -156,7 +155,7 @@ class Randomizer(object):
 
         if 'attack' in [cardtype.type for cardtype in randomcard.types]\
                 and config['attack forces reaction']\
-                and not self.requirement_satisfied('reaction'):
+                and not self.type_requirement_satisfied('reaction'):
             if len(self.kingdom) == 9:
                 # We still need a reaction card but the kingdom would be full after adding this one. Try again
                 self.randomize_card(cardtype, cardattr, expansion)

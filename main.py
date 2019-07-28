@@ -7,7 +7,7 @@ from sources.single_game_dict import game as gamedict
 
 # PARAMETERS #
 reinitiate_database = False
-insert_game = True
+insert_game = False
 randomizer_maxtries = 10000
 # ---------- #
 

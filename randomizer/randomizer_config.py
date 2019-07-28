@@ -13,9 +13,9 @@ config = {
         "plusCoins": 0,
     },
     "forced types": {
-        "attack": False,
-        "reaction": False,
-        "trasher": True
+        "attack": 0,
+        "reaction": 0,
+        "trasher": 3
     },
     "popularity": {
         "min": 0.01,
