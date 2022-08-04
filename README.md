@@ -4,6 +4,7 @@ Randomizes a kingdom of 10 cards for the game Dominion, based on config paramete
 
 Supports only these sets: Base, Intrigue, Dark ages, Prosperity
 
+```
 config = {
     "cards per set": {
         "base": 1,
@@ -32,3 +33,4 @@ config = {
     "games to exclude": 3,
     "exclude cards if voted x times": 1
 }
+```
