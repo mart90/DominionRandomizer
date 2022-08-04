@@ -1,6 +1,6 @@
 # DominionRandomizer
 
-Randomizes a kingdom of 10 cards for the game Dominion, based on config parameters below. Includes features to exclude cards used in recent games and filter by card popularity within your playing group with the help of a google sheets spreadsheet.
+Randomizes a kingdom of 10 cards for the game Dominion, based on config parameters below. Includes features to exclude cards used in recent games, and to filter by card popularity within your playing group with the help of a google sheets spreadsheet.
 
 Supports only these sets: Base, Intrigue, Dark ages, Prosperity
 
